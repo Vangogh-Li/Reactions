@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The New York Times - Inspired</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="frontpage.css">
+    <link rel="stylesheet" href="index.css">
+    
+</head>
+<body>
+    <header>
+        <nav class="navbar" >
+            <div class="nav-wrapper">
+            <div class="nav-left">
+                <img src="images/Logo.png" alt="Bronx Science Reactions Logo" class="nav-logo">
+                <span class="logo">Bronx Science Reactions</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="About.html">About</a></li>
+                <li><a href="Staff.html">Staff</a></li>
+                <li><a href="Multimedia.html">Past Editions</a></li>
+            </ul>
+
+            <!-- Login / Sign Up -->
+            <div class="nav-buttons" id="navButtons">
+                <a href="#" class="login-link" onclick="openLogin()">Log In</a>
+                <button class="signup-btn" onclick="openSignup()">Sign Up</button>
+            </div>
+
+            <!-- SINGLE User Profile (dropdown nested correctly) -->
+            <div class="nav-user" id="navUser" style="display:none;">
+                <img style="width: 40px; height: 40px; border-radius: 20px;" src="images/default.jpeg">
+                <span class="nav-username" id="navUsername">Jayden Pan</span>
+
+                <div class="user-dropdown" id="userDropdown">
+                <input type="file" id="changePic" accept="image/*" style="display:none;">
+                <div class="dropdown-item" onclick="changeUsername()">
+                    <img style="width: 22px; margin-right: 6px;" src="images/upload-svgrepo-com.svg" alt="camera"> Username
+                </div>
+                <div class="dropdown-item" onclick="logoutUser()"> 
+                    <img style="width: 22px; margin-right: 6px;" src="images/signout-svgrepo-com.svg" alt="camera">  Sign Out
+                </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <section class="main-article">
+            <img src="images/Banner.png" alt="Main Article" style="object-fit:contain;max-height:200px;background:#f5f5f5;">
+            <h1>Whenever there is a Action, there is a Reaction</h1>
+            <p>
+                Explore how Bronx Science students connect with world-changing scientific events, research breakthroughs, and the vibrant life of our school community.
+            </p>
+        </section>
+        <section class="content-grid">
+            <!-- Featured Article -->
+            <div class="featured-article">
+                <div id="article-1" class="hero-card"></div>
+            </div>
+
+            <!-- Trending Articles -->
+            <div class="trending-section">
+                <h2 class="section-header">Editorial</h2>
+                <div class="trending-grid">
+                    <div id="article-2" class="trending-card"></div>
+                    <div id="article-3" class="trending-card"></div>
+                    <div id="article-4" class="trending-card"></div>
+                </div>
+            </div>
+
+            <!-- Latest News -->
+            <div class="latest-section">
+                <h2 class="section-header">Selected Articles</h2>
+                <div class="latest-grid">
+                    <div id="article-5" class="latest-card"></div>
+                    <div id="article-6" class="latest-card"></div>
+                    <div id="article-7" class="latest-card"></div>
+                    <div id="article-8" class="latest-card"></div>
+                </div>
+            </div>
+
+            <!-- Editorial Spotlight -->
+            <div class="editorial-spotlight">
+                <h2 class="section-header">Editorial Spotlight</h2>
+                <div id="article-9" class="editorial-card"></div>
+            </div>
+        </section>
+
+
+    </div>
+
+    <!-- Login/Signup Modal -->
+     <!-- Sign Up Modal -->
+    <div class="login-modal" id="signupModal">
+    <div class="login-box modern-modal">
+        <button class="close-modal" onclick="closeSignup()">&times;</button>
+        <h2 class="modal-title">Create Your Account</h2>
+
+        <form class="email-form" action="signup.php" method="POST">
+
+        <input type="text" id="signupUser" name="username" placeholder="Choose a username" required>
+        <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
+        <input type="password" id="signupPass" name="password" placeholder="Create a password" required>
+
+
+        <button type="submit" class="email-continue">Sign Up</button>
+        </form>
+
+        <div id="signupMsg" class="modal-msg"></div>
+    </div>
+    </div>
+    <!-- Login/Signup Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box modern-modal" id="loginBox">
+            <button class="close-modal" onclick="closeLogin()">&times;</button>
+            <h2 class="modal-title">Welcome to Bronx Science Journals</h2>
+
+            <form class="email-form" onsubmit="submitEmailLogin(event)">
+            <input type="text" id="emailInput" placeholder="Enter Username or Email" required>
+
+            <input type="password" id="passwordInput" placeholder="Enter Password" required>
+
+            <button type="submit" class="email-continue">Login</button>
+            </form>
+
+            <div class="modal-footer">
+            <a href="#" class="modal-link">Terms</a> &bull;
+            <a href="#" class="modal-link">Privacy</a>
+            </div>
+            <div id="loginMsg" class="modal-msg"></div>
+        </div>
+    </div>
+        
+
+
+        <script>
+            function openLogin() {
+            document.getElementById("loginModal").style.display = "block";
+            }
+
+            function closeLogin() {
+            document.getElementById("loginModal").style.display = "none";
+            }
+
+            function openSignup() {
+            document.getElementById("signupModal").style.display = "block";
+            }
+
+            function closeSignup() {
+            document.getElementById("signupModal").style.display = "none";
+            }
+        </script>
+
+    <script>
+        
+
+        // === LOGIN ===
+        // === LOGIN ===
+async function submitEmailLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const msg = document.getElementById('loginMsg');
+
+    // Admin account shortcut
+    const adminUser = "admin1";
+    const adminPass = "123456";
+
+    if (username === adminUser && password === adminPass) {
+        msg.style.color = "limegreen";
+        msg.innerText = "Welcome, Admin! Redirecting…";
+        setTimeout(() => {
+            window.location.href = "admin_panel.html";
+        }, 900);
+        return;
+    }
+
+    try {
+        const response = await fetch("login.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            msg.style.color = "#61a9ea";
+            msg.innerText = `Welcome, ${username}!`;
+            setTimeout(() => {
+                closeLogin();
+                showUser(username);
+            }, 800);
+        } else {
+            msg.style.color = "red";
+            msg.innerText = data.message;
+        }
+
+    } catch (error) {
+        console.error(error);
+        msg.style.color = "red";
+        msg.innerText = "Server error. Please try again later.";
+    }
+}
+
+
+
+        // === SIGN UP ===
+        document.querySelector('#signupModal form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const msg = document.getElementById('signupMsg');
+
+            try {
+                const res = await fetch('signup.php', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.success) {
+                    msg.style.color = 'limegreen';
+                    msg.innerText = data.success;
+                    const username = formData.get('username');
+                    e.target.reset();
+                    setTimeout(() => {
+                        closeSignup();
+                        showUser(username);
+                    }, 1200);
+                } else {
+                    msg.style.color = 'red';
+                    msg.innerText = data.error || 'Error signing up.';
+                }
+            } catch (err) {
+                msg.style.color = 'red';
+                msg.innerText = 'Server error: ' + err.message;
+            }
+        });
+        </script>
+        <script>
+                     // === Show user (username + avatar) ===
+                    function showUser(username, avatar = null) {
+                    // Hide login/signup buttons
+                    document.getElementById("navButtons").style.display = "none";
+                    
+                    // Show profile section
+                    const navUser = document.getElementById("navUser");
+                    navUser.style.display = "flex";
+                    
+                    document.getElementById("navUsername").innerText = username;
+                    
+                    // Fallback: use default if avatar missing
+                    const avatarSrc = avatar || localStorage.getItem("userAvatar") || "images/default_profile.png";
+                    document.getElementById("userAvatar").src = avatarSrc;
+                    
+                    // Save to localStorage
+                    localStorage.setItem("loggedUser", username);
+                    localStorage.setItem("userAvatar", avatarSrc);
+                    }
+
+                    // === Change username ===
+                    function changeUsername() {
+                    const newName = prompt("Enter a new username:");
+                    if (newName && newName.trim() !== "") {
+                        document.getElementById("navUsername").innerText = newName;
+                        localStorage.setItem("loggedUser", newName);
+                        alert("Username updated!");
+                    }
+                    }
+
+                    // === Change profile picture ===
+                    document.getElementById("changePic").addEventListener("change", function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                        const base64 = event.target.result;
+                        document.getElementById("userAvatar").src = base64;
+                        localStorage.setItem("userAvatar", base64); // store permanently
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                    });
+
+                    // === Logout ===
+                    function logoutUser() {
+                    if (confirm("Are you sure you want to sign out?")) {
+                        localStorage.removeItem("loggedUser");
+                        localStorage.removeItem("userAvatar");
+                        document.getElementById("navUser").style.display = "none";
+                        document.getElementById("navButtons").style.display = "flex";
+                    }
+                    }
+
+                    // === Restore on reload ===
+                    window.addEventListener("DOMContentLoaded", () => {
+                    const savedUser = localStorage.getItem("loggedUser");
+                    const savedAvatar = localStorage.getItem("userAvatar");
+                    if (savedUser) {
+                        showUser(savedUser, savedAvatar);
+                    }
+                    });
+
+        </script>
+      
+
+        <script>
+async function loadArticles() {
+  try {
+    const res = await fetch("load_articles.php");
+    const articles = await res.json();
+
+    // === Featured article (slot 1) ===
+    const featured = articles[1];
+    const featuredEl = document.getElementById('article-1');
+    if (featured && featuredEl) {
+      featuredEl.innerHTML = `
+        <a href="article.php?id=${featured.id}" class="article-link">
+          <img src="uploads/${featured.image}" alt="${featured.title}">
+          <h3>${featured.title}</h3>
+          <p class="meta">By ${featured.author} — ${featured.created_at.split(' ')[0]}</p>
+          <p>${featured.content.substring(0, 200)}...</p>
+        </a>
+      `;
+    }
+
+    // === Trending articles (slots 2–4) ===
+   // Load trending articles (slots 2–4)
+        for (let slot = 2; slot <= 4; slot++) {
+        const article = articles[slot];
+        const el = document.getElementById(`article-${slot}`);
+        if (article && el) {
+            el.innerHTML = `
+            <a href="article.php?id=${article.id}" class="article-link">
+                <img src="uploads/${article.image}" alt="${article.title}">
+                <h3>${article.title}</h3>
+                <p class="meta">By ${article.author} — ${article.created_at.split(' ')[0]}</p>
+            </a>
+            `;
+        }
+        }
+
+        const trendingContainer =
+        document.querySelector(".trending-cards") ||
+        document.querySelector(".trending-section");
+
+        if (trendingContainer) {
+        const journalSection = document.createElement("section");
+        journalSection.className = "journal-section";
+        journalSection.innerHTML = `
+
+            <div class="journal-links">
+
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSf5F623dl1C8PUzvsnevy9DToQFZBbcMZxxE8nfnnJUq0QkIg/viewform" target="_blank" class="journal-card">
+                <img src="images/google-form-icon-logo-symbol-free-png.webp" alt="">
+                <span>Join Reactions!</span>
+            </a>
+
+            <a href="https://www.instagram.com/bxscireactions" target="_blank" class="journal-card">
+                <img src="images/Instagram_logo_2016.svg.png" alt="">
+                <span>Follow us on Insta!</span>
+            </a>
+
+            <a href="https://discord.gg/qsjzsD5cvQ" target="_blank" class="journal-card">
+                <img src="images/discord.svg.png.webp" alt="">
+                <span>Join us on Discord!</span>
+            </a>
+
+            <a href="https://classroom.google.com/c/yourclasscode" target="_blank" class="journal-card">
+                <img src="images/google classroom.webp" alt="">
+                <span>Google Classroom!</span>
+            </a>
+            </div>
+
+            <div class="journal-socials">
+            <a href="https://www.instagram.com/bxscireactions" target="_blank">
+                <img src="images/instagram-svgrepo-com.svg" alt="Instagram">
+            </a>
+            <a href="mailto:adelinen@nycstudents.net">
+                <img src="images/email-mails-svgrepo-com.svg" alt="Email">
+            </a>
+            </div>
+        `;
+        trendingContainer.appendChild(journalSection);
+        } else {
+        console.error(" Could not find trending container");
+        }
+
+
+
+
+            // === Latest articles (slots 5–8) ===
+            for (let slot = 5; slot <= 8; slot++) {
+            const article = articles[slot];
+            const el = document.getElementById(`article-${slot}`);
+            if (article && el) {
+                el.innerHTML = `
+                <a href="article.php?id=${article.id}" class="article-link">
+                    <img src="uploads/${article.image}" alt="${article.title}">
+                    <h3>${article.title}</h3>
+                    <p class="meta">By ${article.author} — ${article.created_at.split(' ')[0]}</p>
+                </a>
+                `;
+            }
+            }
+
+            // === Editorial spotlight (slot 9) ===
+            const editorial = articles[9];
+            const editorialEl = document.getElementById('article-9');
+            if (editorial && editorialEl) {
+            editorialEl.innerHTML = `
+                <a style=" width: 100%;" href="article.php?id=${editorial.id}" class="article-link">
+                <img src="uploads/${editorial.image}" alt="${editorial.title}">
+                <div>
+                    <h3>${editorial.title}</h3>
+                    <p class="meta">By ${editorial.author} — ${editorial.created_at.split(' ')[0]}</p>
+                    <p>${editorial.content.substring(0, 150)}...</p>
+                </div>
+                </a>
+            `;
+            }
+
+  } catch (err) {
+    console.error("Error loading articles:", err);
+  }
+}
+
+loadArticles();
+</script>
+
+
+</body>
+</html>

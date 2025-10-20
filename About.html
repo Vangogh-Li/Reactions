@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The New York Times - Inspired</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="About.css">
+    <link rel="stylesheet" href="frontpage.css">
+    <link rel="stylesheet" href="index.css">
+    
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-wrapper">
+            <div class="nav-left">
+                <img src="images/Logo.png" alt="Bronx Science Reactions Logo" class="nav-logo">
+                <span class="logo">Bronx Science Reactions</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="About.html">About</a></li>
+                <li><a href="Staff.html">Staff</a></li>
+                <li><a href="Multimedia.html">Past Editions</a></li>
+            </ul>
+
+            <!-- Login / Sign Up -->
+            <div class="nav-buttons" id="navButtons">
+                <a href="#" class="login-link" onclick="openLogin()">Log In</a>
+                <button class="signup-btn" onclick="openSignup()">Sign Up</button>
+            </div>
+
+            <!--  SINGLE User Profile (dropdown nested correctly) -->
+            <div class="nav-user" id="navUser" style="display:none;">
+                <img style="width: 40px; height: 40px; border-radius: 20px;" src="images/default.jpeg">
+                <span class="nav-username" id="navUsername">Jayden Pan</span>
+
+                <div class="user-dropdown" id="userDropdown">
+                <input type="file" id="changePic" accept="image/*" style="display:none;">
+                <div class="dropdown-item" onclick="changeUsername()">
+                    <img style="width: 22px; margin-right: 6px;" src="images/upload-svgrepo-com.svg" alt="camera"> Username
+                </div>
+                <div class="dropdown-item" onclick="logoutUser()"> 
+                    <img style="width: 22px; margin-right: 6px;" src="images/signout-svgrepo-com.svg" alt="camera">  Sign Out
+                </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+    </header>
+  <!-- Main section -->
+  <main class="about-hero">
+    <div class="about-grid">
+      <!-- Left image -->
+      <figure class="about-image">
+        <!-- Replace with your image path -->
+        <img src="images/Logo.png" alt="Reactions mural and students">
+      </figure>
+
+      <!-- Right content -->
+      <section class="about-copy">
+
+        <p>
+          <strong>REACTIONS</strong> is a school publication written by students of the Physical Science Department of Bronx High School of Science. 
+          A small group of students from all grade levels craft physics and chemistry related articles, graphics, puzzles, etc., for publication, 
+          then sees to all aspects of the production of the journal including ad sales, printing, binding, and journal sales. 
+          This occurs under the guidance of an experienced department advisor on an annual basis.
+          We meed bi-weekly every <strong>wedensday</strong> at room <strong>227</strong> during <strong>SGI</strong>.
+
+        <p>The 2020-21 edition won the REALM Merit Award, 
+          an award by the NCTE that recognizes outstandingly well-designed and written journals!
+        </p>
+
+      </section>
+    </div>
+  </main>
+</body>
+
+</body>
+<script>
+                     // === Show user (username + avatar) ===
+                    function showUser(username, avatar = null) {
+                    // Hide login/signup buttons
+                    document.getElementById("navButtons").style.display = "none";
+                    
+                    // Show profile section
+                    const navUser = document.getElementById("navUser");
+
+                    navUser.style.display = "flex";
+                    navUser.style.marginTop = "none";
+                    document.getElementById("navUsername").innerText = username;
+                    
+                    // Fallback: use default if avatar missing
+                    const avatarSrc = avatar || localStorage.getItem("userAvatar") || "images/default_profile.png";
+                    document.getElementById("userAvatar").src = avatarSrc;
+                    
+                    // Save to localStorage
+                    localStorage.setItem("loggedUser", username);
+                    localStorage.setItem("userAvatar", avatarSrc);
+                    }
+
+                    // === Change username ===
+                    function changeUsername() {
+                    const newName = prompt("Enter a new username:");
+                    if (newName && newName.trim() !== "") {
+                        document.getElementById("navUsername").innerText = newName;
+                        localStorage.setItem("loggedUser", newName);
+                        alert("Username updated!");
+                    }
+                    }
+
+                    // === Change profile picture ===
+                    document.getElementById("changePic").addEventListener("change", function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                        const base64 = event.target.result;
+                        document.getElementById("userAvatar").src = base64;
+                        localStorage.setItem("userAvatar", base64); // store permanently
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                    });
+
+                    // === Logout ===
+                    function logoutUser() {
+                    if (confirm("Are you sure you want to sign out?")) {
+                        localStorage.removeItem("loggedUser");
+                        localStorage.removeItem("userAvatar");
+                        document.getElementById("navUser").style.display = "none";
+                        document.getElementById("navButtons").style.display = "flex";
+                    }
+                    }
+
+                    // === Restore on reload ===
+                    window.addEventListener("DOMContentLoaded", () => {
+                    const savedUser = localStorage.getItem("loggedUser");
+                    const savedAvatar = localStorage.getItem("userAvatar");
+                    if (savedUser) {
+                        showUser(savedUser, savedAvatar);
+                    }
+                    });
+
+</script>
+
+ <!-- Sign Up Modal -->
+    <div class="login-modal" id="signupModal">
+    <div class="login-box modern-modal">
+        <button class="close-modal" onclick="closeSignup()">&times;</button>
+        <h2 class="modal-title">Create Your Account</h2>
+
+        <form class="email-form" action="signup.php" method="POST">
+
+        <input type="text" id="signupUser" name="username" placeholder="Choose a username" required>
+        <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
+        <input type="password" id="signupPass" name="password" placeholder="Create a password" required>
+
+
+        <button type="submit" class="email-continue">Sign Up</button>
+        </form>
+
+        <div id="signupMsg" class="modal-msg"></div>
+    </div>
+    </div>
+    <!-- Login/Signup Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box modern-modal" id="loginBox">
+            <button class="close-modal" onclick="closeLogin()">&times;</button>
+            <h2 class="modal-title">Welcome to Bronx Science Journals</h2>
+
+            <form class="email-form" onsubmit="submitEmailLogin(event)">
+            <input type="text" id="emailInput" placeholder="Enter Username or Email" required>
+
+            <input type="password" id="passwordInput" placeholder="Enter Password" required>
+
+            <button type="submit" class="email-continue">Login</button>
+            </form>
+
+            <div class="modal-footer">
+            <a href="#" class="modal-link">Terms</a> &bull;
+            <a href="#" class="modal-link">Privacy</a>
+            </div>
+            <div id="loginMsg" class="modal-msg"></div>
+        </div>
+    </div>
+      <script>
+            function openLogin() {
+            document.getElementById("loginModal").style.display = "block";
+            }
+
+            function closeLogin() {
+            document.getElementById("loginModal").style.display = "none";
+            }
+
+            function openSignup() {
+            document.getElementById("signupModal").style.display = "block";
+            }
+
+            function closeSignup() {
+            document.getElementById("signupModal").style.display = "none";
+            }
+        </script>
+
+    <script>
+        
+
+        // === LOGIN ===
+        function submitEmailLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const msg = document.getElementById('loginMsg');
+
+            const adminUser = "admin1";
+            const adminPass = "123456";
+
+            console.log("Login attempt:", username, password); // Debug log
+
+            if (username === adminUser && password === adminPass) {
+                msg.style.color = "limegreen";
+                msg.innerText = "Welcome, Admin! Redirecting…";
+                setTimeout(() => {
+                    window.location.href = "admin_panel.html";
+                }, 900);
+                return;
+            }
+
+            // Simulate successful user login
+            if (username && password) {
+                msg.style.color = "#61a9ea";
+                msg.innerText = `Welcome, ${username}!`;
+                setTimeout(() => {
+                    closeLogin();
+                    showUser(username);
+                }, 800);
+            } else {
+                msg.style.color = "red";
+                msg.innerText = "Invalid credentials.";
+            }
+        }
+
+        // === SIGN UP ===
+        document.querySelector('#signupModal form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const msg = document.getElementById('signupMsg');
+
+            try {
+                const res = await fetch('signup.php', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.success) {
+                    msg.style.color = 'limegreen';
+                    msg.innerText = data.success;
+                    const username = formData.get('username');
+                    e.target.reset();
+                    setTimeout(() => {
+                        closeSignup();
+                        showUser(username);
+                    }, 1200);
+                } else {
+                    msg.style.color = 'red';
+                    msg.innerText = data.error || 'Error signing up.';
+                }
+            } catch (err) {
+                msg.style.color = 'red';
+                msg.innerText = 'Server error: ' + err.message;
+            }
+        });
+        </script>

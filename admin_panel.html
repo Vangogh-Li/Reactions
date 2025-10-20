@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | Bronx Science Reactions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-left">
+        <img src="images/Logo.png" alt="Logo" class="logo-img">
+        <div class="header-text">
+          <h1>Admin Dashboard <img style="width: 30px; margin-right: 6px;" src="images/3u-server-svgrepo-com.svg" alt="camera"></h1>
+          <p>Bronx Science Reactions</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="index.html" class="btn-back">← Back to Site</a>
+        <div class="admin-info">
+          <span class="admin-badge"><img style="width: 16px; margin-right: 6px; padding-top: 4px;" src="images/admin-user-web-svgrepo-com.svg" alt="camera">Admin</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <!-- USERS -->
+    <section class="card users-card">
+      <div class="card-header">
+        <h2>Registered Users</h2>
+        <p class="card-subtitle">Manage user accounts and permissions</p>
+      </div>
+      <div class="table-container">
+        <table id="userTable" class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Created</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- UPLOAD -->
+    <section class="card upload-card">
+      <div class="card-header">
+        <h2>Upload New Article</h2>
+        <p class="card-subtitle">Add or replace articles in specific slots on the front page</p>
+      </div>
+      
+      <form id="uploadForm" enctype="multipart/form-data" class="upload-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="slot">Article Slot</label>
+            <select name="slot" id="slot" required>
+              <option value="">Select a slot...</option>
+              <optgroup label="News Section">
+                <option value="1">1 — Main News Article</option>
+                <option value="2">2 — News Article #1</option>
+                <option value="3">3 — News Article #2</option>
+                <option value="4">4 — News Article #3</option>
+                <option value="5">5 — News Article #4</option>
+                <option value="6">6 — News Article #5</option>
+              </optgroup>
+              <optgroup label="Editorial Section">
+                <option value="7">7 — Main Editorial Article</option>
+                <option value="8">8 — Editorial Article #1</option>
+                <option value="9">9 — Editorial Article #2</option>
+              </optgroup>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="author">Author</label>
+            <input type="text" name="author" id="author" placeholder="Enter author name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Article Title</label>
+          <input type="text" name="title" id="title" placeholder="Enter article title" required>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea name="content" id="content" rows="6" placeholder="Write your article content here..." required></textarea>
+        </div>
+
+        <div class="form-group image-upload">
+          <label for="image">Featured Image</label>
+          <div class="file-upload-area">
+            <input type="file" name="image" id="image" accept="image/*" class="file-input">
+            <div class="file-upload-display">
+              <div class="upload-icon"><img style="width: 80px;" src="images/camera-svgrepo-com.svg" alt="camera"></div>
+              <p>Click to select image or drag & drop</p>
+              <small>Recommended: 800x600px or larger</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-upload">
+            <span class="btn-icon"><img style="width: 40px;" src="images/upload-svgrepo-com.svg" alt="Edit"></span>
+            Upload Article
+          </button>
+        </div>
+      </form>
+
+      <div id="uploadMsg" class="msg"></div>
+    </section>
+
+    <!-- CURRENT ARTICLES BY SLOT -->
+    <section class="card slots-card">
+      <div class="card-header">
+        <h2>Current Articles by Slot</h2>
+        <p class="card-subtitle">Overview of all article positions on the front page</p>
+      </div>
+      <div class="slots-container" id="slotsContainer">
+        <!-- Slots will be populated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- ALL ARTICLES -->
+    <section class="card articles-card">
+      <div class="card-header">
+        <h2>All Articles</h2>
+        <p class="card-subtitle">Complete list of all published articles</p>
+      </div>
+      <div class="table-container">
+        <table id="articleTable" class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Slot</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Image</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    async function safeJSON(url) {
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        console.error(`Fetch failed for ${url}`, err);
+        return { error: err.message };
+      }
+    }
+
+    async function loadUsers() {
+        const data = await safeJSON("fetch_users.php");
+        const tbody = document.querySelector("#userTable tbody");
+
+        if (data.error) {
+          tbody.innerHTML = `<tr><td colspan="7" style="color:red;">${data.error}</td></tr>`;
+          return;
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="opacity:.7;">No users yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.map(u => {
+          const isAdmin = u.username.toLowerCase() === "admin1";
+
+          return `
+            <tr class="${isAdmin ? "admin-row" : ""}">
+              <td>${u.id}</td>
+              <td><input type="text" value="${escapeHTML(u.username)}" id="user-${u.id}-name" ${isAdmin ? "disabled" : ""}></td>
+              <td><input type="text" value="${escapeHTML(u.email)}" id="user-${u.id}-email" ${isAdmin ? "disabled" : ""}></td>
+              <td><input type="text" value="${escapeHTML(u.password)}" id="user-${u.id}-pass" ${isAdmin ? "disabled" : ""}></td>
+              <td>${u.created_at || ""}</td>
+              <td>
+                <span class="status-badge ${isAdmin ? "admin" : "user"}">
+                  ${isAdmin ? "ADMIN" : "USER"}
+                </span>
+              </td>
+              <td>
+                ${isAdmin 
+                  ? `<span style="color:#888; font-weight:600;">Locked</span>` 
+                  : `<button class="btn-action btn-save" 
+                            onclick="saveUser(${u.id})" 
+                            title="Save Changes" 
+                            style="background:white; color:black; border:1px solid #ccc; padding:6px 10px; border-radius:6px; font-weight:600; display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
+                      <img style="width:20px; margin-right:4px;" src="images/Save.svg" alt="Save">
+                      Save
+                    </button>
+                    `
+                }
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+
+      async function saveUser(id) {
+        const username = document.getElementById(`user-${id}-name`).value.trim();
+        const email = document.getElementById(`user-${id}-email`).value.trim();
+        const password = document.getElementById(`user-${id}-pass`).value.trim();
+
+        if (!username || !email || !password) {
+          alert("All fields are required.");
+          return;
+        }
+
+        const res = await fetch("update_user.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, username, email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          alert("User updated successfully!");
+          loadUsers(); // refresh table
+        } else {
+          alert("False " + data.message);
+        }
+      }
+
+
+    async function loadArticles() {
+      const data = await safeJSON("fetch_articles.php");
+      const tbody = document.querySelector("#articleTable tbody");
+      const slotsContainer = document.getElementById("slotsContainer");
+
+      console.log("Articles data:", data); // Debug log
+
+      if (data?.error) {
+        tbody.innerHTML = `<tr><td colspan="7" style="color:red;">${data.error}</td></tr>`;
+        slotsContainer.innerHTML = `<p style="color:red;">${data.error}</p>`;
+        return;
+      }
+
+      // Convert array to slot-based object for slots view
+      const slotData = {};
+      if (Array.isArray(data)) {
+        data.forEach(article => {
+          if (article.slot) {
+            slotData[article.slot] = article;
+          }
+        });
+      }
+
+      // Load slots view
+      let slotsHTML = '<div class="slots-grid">';
+      for (let slot = 1; slot <= 9; slot++) {
+        const article = slotData[slot];
+        const slotName = getSlotName(slot);
+        slotsHTML += `
+          <div class="slot-card">
+            <h3>Slot ${slot}: ${slotName}</h3>
+            ${article ? `
+              <div class="current-article">
+                <img src="uploads/${article.image || 'placeholder.jpg'}" alt="${article.title}" style="max-width:100px;border-radius:6px;">
+                <div>
+                  <strong>${escapeHTML(article.title)}</strong><br>
+                  <small>By ${escapeHTML(article.author)}</small><br>
+                  <small>${article.created_at}</small>
+                </div>
+              </div>
+            ` : '<p style="opacity:.7;">No article in this slot</p>'}
+          </div>
+        `;
+      }
+      slotsHTML += '</div>';
+      slotsContainer.innerHTML = slotsHTML;
+
+      // Load all articles table
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="opacity:.7;">No articles yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(a => `
+        <tr>
+          <td>${a.id}</td>
+          <td>
+            <span class="slot-badge slot-${a.slot || 'none'}">${a.slot || 'N/A'}</span>
+          </td>
+          <td class="title-cell">${escapeHTML(a.title)}</td>
+          <td>${escapeHTML(a.author)}</td>
+          <td>${a.image ? `<img src="uploads/${encodeURI(a.image)}" class="table-image">` : "<span class='no-image'>No image</span>"}</td>
+          <td>${a.created_at || ""}</td>
+          <td>
+            <button class="btn-action" onclick="editArticle(${a.id})" title="Edit">
+              <img style="width: 20px;" src="images/edit-button-svgrepo-com.svg" alt="Edit">
+            </button>
+
+            <button class="btn-action" onclick="deleteArticle(${a.id})" title="Delete">
+              <img style="width: 20px;" src="images/delete-svgrepo-com.svg" alt="Edit">
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function getSlotName(slot) {
+      const names = {
+        1: "Main News Article",
+        2: "News Article #1",
+        3: "News Article #2", 
+        4: "News Article #3",
+        5: "News Article #4",
+        6: "News Article #5",
+        7: "Main Editorial Article",
+        8: "Editorial Article #1",
+        9: "Editorial Article #2"
+      };
+      return names[slot] || `Slot ${slot}`;
+    }
+
+    function escapeHTML(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    async function editArticle(id) {
+        const newTitle = prompt("Enter new title:");
+        const newAuthor = prompt("Enter new author:");
+        const newContent = prompt("Enter new content:");
+
+        if (!newTitle || !newAuthor || !newContent) {
+          alert("All fields are required!");
+          return;
+        }
+
+        const response = await fetch("edit_article.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, title: newTitle, author: newAuthor, content: newContent })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Article Edited" + result.message);
+          loadArticles(); // refresh table
+        } else {
+          alert("False " + result.message);
+        }
+      }
+
+      async function deleteArticle(id) {
+        if (!confirm(`Are you sure you want to delete article ${id}? This cannot be undone.`)) return;
+
+        const formData = new FormData();
+        formData.append("id", id);
+
+        const response = await fetch("delete_article.php", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Aricle Deleted" + result.message);
+          loadArticles(); // refresh after deletion
+        } else {
+          alert("False" + result.message);
+        }
+      }
+
+
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch("upload_article.php", { method: "POST", body: formData });
+      const msg = await res.text();
+      document.getElementById("uploadMsg").innerText = msg;
+      loadArticles();
+    });
+
+    loadUsers();
+    loadArticles();
+  </script>
+</body>
+</html>
